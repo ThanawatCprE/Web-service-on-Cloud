@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+<style> 
+
+.flex-container {
+    display: -webkit-flex;
+    display: flex;  
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    text-align: center;
+}
+
+.flex-container > * {
+    padding: 15px;
+    -webkit-flex: 1 100%;
+    flex: 1 100%;
+}
+
+.article {
+    text-align: left;
+}
+
+header {background: black;color:white;}
+footer {background: #aaa;color:white;}
+.nav {background:#eee;}
+
+.nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+.nav ul a {
+    text-decoration: none;
+}
+
+@media all and (min-width: 768px) {
+    .nav {text-align:left;-webkit-flex: 1 auto;flex:1 auto;-webkit-order:1;order:1;}
+    .article {-webkit-flex:5 0px;flex:5 0px;-webkit-order:2;order:2;}
+    footer {-webkit-order:3;order:3;}
+}
+table {
+    font-family: arial, sans-serif;
+    font-size: 12px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+<script type ="text/javascript">
+            function soapify () {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.getAllResponseHeaders();
+                xmlhttp.open('POST','http://127.0.0.1:3036/getData',true);
+                 var input = '<?xml version="1.0"?>' +
+                 '<Requestquery>' +
+                    '<Words>'+document.getElementById('Words').value+'</Words>'+
+                 '</Requestquery>';
+                xmlhttp.onreadystatechange = function() {
+                    if(xmlhttp.readyState == 4)
+                    {
+                        if(xmlhttp.status == 200){
+                            console.log("Data pushed\n");
+                            result = JSON.parse(xmlhttp.responseText);
+                            console.log(result)
+                            
+                            data_to_create = JSON.parse(result.queryResult.string[0]);
+                            // console.log(data_to_create.stu_id)
+                            var column = Object.keys(data_to_create);
+                            var cTable = '<tr>';
+                            console.log(column);
+                            for (var i = 0; i < column.length; i++) {
+                                cTable = cTable +"<th>"+column[i]+"</th>" ;
+                            }
+                            cTable = cTable +"</tr>";
+                            for (var i = 0; i < result.queryResult.string.length; i++) {
+                                cTable = cTable +"<tr>";
+                                data_to_create = JSON.parse(result.queryResult.string[i]);
+                                for(var j = 0; j < column.length; j++){
+                                    cTable = cTable +"<th>"+data_to_create[column[j]]+"</th>" ;
+                                }
+                                cTable = cTable +"</tr>";
+                            }
+                            document.getElementById("createTB").innerHTML = cTable;
+                        }
+                    }
+                }
+                xmlhttp.setRequestHeader('Content-Type','text/xml');
+                xmlhttp.send(input);
+            }
+</script>
+</head>
+<body>
+
+<div class="flex-container">
+<header>
+  <h1>Class Schedule</h1>
+</header>
+
+<!-- <nav class="nav">
+    <h1>W11</h1>
+    <h2>Web Services On Cloud</h2>
+</nav> -->
+
+<article class="article">
+   <form>
+        Table for Query: 
+        <select name="Words" id="Words">
+            <option value="student">Student</option>
+            <option value="subject">Subject</option>
+            <option value="teacher">Teacher</option>
+        </select>
+        <input type = "button" value = "Enter" onclick = "soapify()"/><br>
+        <table id="createTB" ></table>
+    </form>
+</article>
+
+<footer>Copyright &copy; W3Schools.com</footer>
+</div>
+
+</body>
+</html>
